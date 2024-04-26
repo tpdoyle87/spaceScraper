@@ -1,11 +1,10 @@
-package main
+package internal
 
 import (
 	"crypto/sha256"
 	"database/sql"
 	"fmt"
 	"github.com/gocolly/colly"
-	_ "github.com/lib/pq"
 )
 
 type Article struct {
@@ -17,14 +16,7 @@ type Article struct {
 	Hash    string
 }
 
-// article.Title = e.ChildText(".article-name")
-func main() {
-	connStr := "user=tom dbname=scraper sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+func FetchArticles(db *sql.DB) {
 	urls := []string{"https://www.space.com/", "https://www.seti.org/news"}
 	c := colly.NewCollector(
 		colly.Async(true),
