@@ -6,8 +6,11 @@ import (
 )
 
 type DatabaseConfig struct {
-	User   string
-	Dbname string
+	User     string
+	Dbname   string
+	Host     string
+	Port     string
+	Password string
 }
 
 type Config struct {
@@ -17,8 +20,11 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		Database: DatabaseConfig{
-			User:   getEnv("DB_USER"),
-			Dbname: getEnv("DB_NAME"),
+			User:     getEnv("DB_USER"),
+			Dbname:   getEnv("DB_NAME"),
+			Host:     getEnv("DB_HOST"),
+			Port:     getEnv("DB_PORT"),
+			Password: getEnv("DB_PASSWORD"),
 		},
 	}
 }

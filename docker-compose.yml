@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  scraper:
+    container_name: scraper
+    build:
+      context: .
+      dockerfile: cmd/scraper/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=articles
+
+  api:
+    container_name: API
+    build:
+      context: .
+      dockerfile: cmd/api/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=articles
+
+  db:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: articles
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

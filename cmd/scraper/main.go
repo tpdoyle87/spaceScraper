@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
@@ -20,8 +21,15 @@ func main() {
 	conf := config.New()
 
 	database := conf.Database
-	connStr := "user=" + database.User + " dbname=" + database.Dbname + " sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
+	host := database.Host // Should be 'db' in Docker Compose setup
+	port := database.Port // Default should be '5432'
+	user := database.User // Default should be 'postgres'
+	password := database.Password
+	dbname := database.Dbname
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +41,7 @@ func main() {
 	}(db)
 
 	c := cron.New()
-	err = c.AddFunc("0 * * * *", func() {
+	err = c.AddFunc("@hourly", func() {
 		log.Info("Fetching articles")
 		internal.FetchArticles(db)
 	})
