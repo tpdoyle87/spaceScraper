@@ -28,8 +28,8 @@ WORKDIR /root/
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/cmd/api/api .
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 3000 to the outside world
+EXPOSE 3000
 
 # Command to run the executable
 CMD ["./api"]

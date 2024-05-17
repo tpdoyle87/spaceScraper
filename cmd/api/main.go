@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"spaceScraper/internal/config"
 )
@@ -41,14 +42,23 @@ func main() {
 	{
 		v1.GET("/articles", GetArticles(db))
 	}
-	err = router.Run("3000")
+	err = router.Run(":3000")
 	if err != nil {
 		return
 	}
 }
 
 func GetArticles(db *sql.DB) gin.HandlerFunc {
-	result, err := db.Exec("WITH RankedArticles AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY Company ORDER BY Date DESC) AS rn FROM articles")
+	query := `WITH RankedArticles AS (
+					SELECT *, ROW_NUMBER() OVER (PARTITION BY Company ORDER BY Date DESC) AS rn
+					FROM articles
+				)
+				SELECT Title, URL
+				FROM RankedArticles
+				WHERE rn <= 10;
+`
+	result, err := db.Query(query)
+	log.Info(result)
 	if err != nil {
 		log.Info("couldn't get articles")
 	}
